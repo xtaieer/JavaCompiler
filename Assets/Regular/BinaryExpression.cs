@@ -8,4 +8,6 @@
         _lhs = lhs;
         _rhs = rhs;
     }
+
+    public abstract void Accept(IRegularExpressionVisitor visitor);
 }

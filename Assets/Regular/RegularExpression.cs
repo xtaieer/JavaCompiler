@@ -4,5 +4,5 @@ using UnityEngine;
 
 public interface IRegularExpression
 {
-
+    void Accept(IRegularExpressionVisitor visitor);
 }

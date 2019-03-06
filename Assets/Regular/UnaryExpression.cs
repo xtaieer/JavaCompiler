@@ -6,4 +6,6 @@
     {
         _operand = operand;
     }
+
+    public abstract void Accept(IRegularExpressionVisitor visitor);
 }
