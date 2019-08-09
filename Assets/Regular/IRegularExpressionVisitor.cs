@@ -1,11 +1,13 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public interface IRegularExpressionVisitor
+﻿namespace Xtaieer.Regular
 {
-    void Leaf(params char[] chars);
-    void Add(IRegularExpression lhs, IRegularExpression rhs);
-    void Or(IRegularExpression lhs, IRegularExpression rhs);
-    void Closure(IRegularExpression operand);
+    public interface IRegularExpressionVisitor
+    {
+        void RangeCharLeaf(char form, char to);
+        void SingleCharLeaf(char c);
+        void Concat(IRegularExpression lhs, IRegularExpression rhs);
+        void Or(IRegularExpression lhs, IRegularExpression rhs);
+        void Closure(IRegularExpression operand);
+        void QuestionMark(IRegularExpression operand);
+        void Epsilon();
+    }
 }

@@ -1,14 +1,17 @@
-﻿public class ClosureExpression : UnaryExpression
+﻿namespace Xtaieer.Regular
 {
-    public ClosureExpression(IRegularExpression operand) : base(operand) { }
-
-    public override void Accept(IRegularExpressionVisitor visitor)
+    public class ClosureExpression : UnaryExpression
     {
-        visitor.Closure(_operand);
-    }
+        public ClosureExpression(IRegularExpression operand) : base(operand) { }
 
-    public override string ToString()
-    {
-        return "[" + _operand.ToString() + "]";
+        public override void Accept(IRegularExpressionVisitor visitor)
+        {
+            visitor.Closure(operand);
+        }
+
+        public override string ToString()
+        {
+            return "[" + operand.ToString() + "]";
+        }
     }
 }

@@ -1,20 +1,18 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class LeafExpression : IRegularExpression
+﻿namespace Xtaieer.Regular
 {
-    private char[] _chars;
-
-    public LeafExpression(params char[] chars)
+    public class LeafExpression : IRegularExpression
     {
-        _chars = chars;
-    }
+        private char[] chars;
 
-    public LeafExpression(string chars) : this(chars.ToCharArray()) {}
+        public LeafExpression(params char[] chars)
+        {
+            this.chars = chars;
+        }
 
-    public void Accept(IRegularExpressionVisitor visitor)
-    {
-        visitor.Leaf(_chars);
+        public LeafExpression(string chars) : this(chars.ToCharArray()) { }
+
+        public void Accept(IRegularExpressionVisitor visitor)
+        {
+        }
     }
 }

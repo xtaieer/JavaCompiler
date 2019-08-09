@@ -1,8 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public interface IRegularExpression
+﻿namespace Xtaieer.Regular
 {
-    void Accept(IRegularExpressionVisitor visitor);
+    public interface IRegularExpression
+    {
+        void Accept(IRegularExpressionVisitor visitor);
+    }
 }

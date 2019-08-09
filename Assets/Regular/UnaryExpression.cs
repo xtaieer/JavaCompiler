@@ -1,11 +1,14 @@
-﻿public abstract class UnaryExpression : IRegularExpression
+﻿namespace Xtaieer.Regular
 {
-    protected IRegularExpression _operand;
-    
-    public UnaryExpression(IRegularExpression operand)
+    public abstract class UnaryExpression : IRegularExpression
     {
-        _operand = operand;
-    }
+        protected IRegularExpression operand;
 
-    public abstract void Accept(IRegularExpressionVisitor visitor);
+        public UnaryExpression(IRegularExpression operand)
+        {
+            this.operand = operand;
+        }
+
+        public abstract void Accept(IRegularExpressionVisitor visitor);
+    }
 }

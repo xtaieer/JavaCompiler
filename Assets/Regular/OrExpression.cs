@@ -1,14 +1,17 @@
-﻿public class OrExpression : BinaryExpression
+﻿namespace Xtaieer.Regular
 {
-    public OrExpression(IRegularExpression lhs, IRegularExpression rhs) : base(lhs, rhs) { }
-
-    public override void Accept(IRegularExpressionVisitor visitor)
+    public class OrExpression : BinaryExpression
     {
-        visitor.Or(_lhs, _rhs);
-    }
+        public OrExpression(IRegularExpression lhs, IRegularExpression rhs) : base(lhs, rhs) { }
 
-    public override string ToString()
-    {
-        return _lhs.ToString() + "|" + _rhs.ToString();
+        public override void Accept(IRegularExpressionVisitor visitor)
+        {
+            visitor.Or(lhs, rhs);
+        }
+
+        public override string ToString()
+        {
+            return lhs.ToString() + "|" + rhs.ToString();
+        }
     }
 }
