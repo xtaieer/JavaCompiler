@@ -1,5 +1,4 @@
-﻿
-public abstract class Edge
+﻿public abstract class Edge
 {
     public abstract bool Match(char c);
 }

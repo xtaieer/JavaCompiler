@@ -1,4 +1,7 @@
-﻿public interface IAutomaton
+﻿namespace Xtaieer.Automaton
 {
-    bool IsAccept(string str);
+    public interface IAutomaton
+    {
+//        bool IsAccept(string str);
+    }
 }

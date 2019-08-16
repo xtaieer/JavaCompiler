@@ -1,7 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using Regular;
+﻿using UnityEngine;
+using Xtaieer.Regular;
 using System.Text;
 
 public class RegularPrinter : IRegularExpressionVisitor
@@ -55,23 +53,6 @@ public class RegularPrinter : IRegularExpressionVisitor
     {
     }
 
-    void IRegularExpressionVisitor.Leaf(params char[] chars)
-    {
-        if(chars.Length > 1)
-        {
-            Print('[');
-            for(int i = 0; i < chars.Length; i ++)
-            {
-                Print(chars[i]);
-            }
-            Print(']');
-        }
-        else if(chars.Length == 1)
-        {
-            Print(chars[0]);
-        }
-    }
-
     void IRegularExpressionVisitor.Or(IRegularExpression lhs, IRegularExpression rhs)
     {
         lhs.Accept(this);
@@ -79,9 +60,56 @@ public class RegularPrinter : IRegularExpressionVisitor
         rhs.Accept(this);
     }
 
+    void IRegularExpressionVisitor.RangeCharLeaf(char from, char to)
+    {
+        Print("[" + from + "-" + to + "]");
+    }
+
+    void IRegularExpressionVisitor.SingleCharLeaf(char c)
+    {
+        Print(c);
+    }
+
+    void IRegularExpressionVisitor.QuestionMark(IRegularExpression operand)
+    {
+        bool isLeaf = operand is LeafExpression;
+        if (!isLeaf)
+        {
+            Print('(');
+            operand.Accept(this);
+            Print(')');
+        }
+        else
+        {
+            operand.Accept(this);
+        }
+        Print('?');
+    }
+
+    void IRegularExpressionVisitor.PositiveClosure(IRegularExpression operand)
+    {
+        bool isLeaf = operand is LeafExpression;
+        if (!isLeaf)
+        {
+            Print('(');
+            operand.Accept(this);
+            Print(')');
+        }
+        else
+        {
+            operand.Accept(this);
+        }
+        Print('+');
+    }
+
     void Print(char c)
     {
         sb.Append(c);
+    }
+
+    void Print(string str)
+    {
+        sb.Append(str);
     }
 
     public void Result()
