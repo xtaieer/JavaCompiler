@@ -163,6 +163,11 @@
                 Match(current);
                 return new SingleCharLeafExpression(c);
             }
+            if(current == '.')
+            {
+                Match(current);
+                return new RangeCharLeafExpression((char)0, (char)255);
+            }
             else
             {
                 if (!IsOperator(current))
