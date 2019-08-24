@@ -9,13 +9,14 @@ namespace Xtaieer.Grammar
     {
         /*
          * S -> Nonterminal:Right'
-         * Right' -> Right;Right' | Right
+         * Right' -> Right;Right' | Right | Empty
          * Right -> Minal Right | Minal
          * Minal -> Terminal | Nonterminal
          */
 
         private enum TokenType
         {
+            SPACE,
             EMPTY,
             SYMBOL,
             MINAL,
@@ -24,7 +25,7 @@ namespace Xtaieer.Grammar
 
         private class Token
         {
-            public static readonly Token EMPTY = new Token("", TokenType.EMPTY);
+            public static readonly Token SPACE = new Token("", TokenType.SPACE);
 
             public string Name
             {
@@ -76,10 +77,11 @@ namespace Xtaieer.Grammar
         public GrammaParser() {
             lex = new LexicalAnalyzer<Token>(
                     new LexicalAnalyzer<Token>.RegularAndAction[] {
-                    new LexicalAnalyzer<Token>.RegularAndAction("\t| ", (lex, line, column) => { return Token.EMPTY;  }),
+                    new LexicalAnalyzer<Token>.RegularAndAction("\t| ", (lex, line, column) => { return Token.SPACE;  }),
                     new LexicalAnalyzer<Token>.RegularAndAction("\".\"", (lex, line, column) => { return new Token(new string(lex[1], 1), TokenType.SINGLE_CHAR_MINAL); }),
                     new LexicalAnalyzer<Token>.RegularAndAction("([A-Z]|[a-z]|[0-9])+", (lex, line, column) => {return new Token(lex, TokenType.MINAL); }),
-                    new LexicalAnalyzer<Token>.RegularAndAction(":|;|%|", (lex, line, column) => {return new Token(lex, TokenType.SYMBOL); })
+                    new LexicalAnalyzer<Token>.RegularAndAction(":|;|%|", (lex, line, column) => {return new Token(lex, TokenType.SYMBOL); }),
+                    new LexicalAnalyzer<Token>.RegularAndAction("ε", (lex, line, column) => { return new Token(lex, TokenType.EMPTY);  })
                 }
             );
         }
@@ -126,22 +128,30 @@ namespace Xtaieer.Grammar
             {
                 result = new List<Minal[]>();
             }
-            LinkedList<Minal> minalLinkedList = new LinkedList<Minal>();
-            minalLinkedList = Right(minalLinkedList);
-            Minal[] minals = new Minal[minalLinkedList.Count];
-            LinkedListNode<Minal> head = minalLinkedList.First;
-            int index = 0;
-            while(head != null)
+            if(current.Type == TokenType.EMPTY)
             {
-                minals[index] = head.Value;
-                index++;
-                head = head.Next;
+                Minal[] minals = new Minal[] { Grammar.Minal.EMPTY };
+                result.Add(minals);
             }
-            result.Add(minals);
-            if (current != null && current.Type == TokenType.SYMBOL && current.Name == ";")
+            else
             {
-                Match(TokenType.SYMBOL);
-                return RightT(result);
+                LinkedList<Minal> minalLinkedList = new LinkedList<Minal>();
+                minalLinkedList = Right(minalLinkedList);
+                Minal[] minals = new Minal[minalLinkedList.Count];
+                LinkedListNode<Minal> head = minalLinkedList.First;
+                int index = 0;
+                while (head != null)
+                {
+                    minals[index] = head.Value;
+                    index++;
+                    head = head.Next;
+                }
+                result.Add(minals);
+                if (current != null && current.Type == TokenType.SYMBOL && current.Name == ";")
+                {
+                    Match(TokenType.SYMBOL);
+                    return RightT(result);
+                }
             }
             return result;
         }
@@ -207,7 +217,7 @@ namespace Xtaieer.Grammar
         private void Match(TokenType type)
         {
             current = lex.NextToken();
-            while (current != null && current.Type == TokenType.EMPTY)
+            while (current != null && current.Type == TokenType.SPACE)
             {
                 current = lex.NextToken();
             }

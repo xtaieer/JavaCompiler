@@ -4,6 +4,8 @@ namespace Xtaieer.Grammar
 {
     public class Minal
     {
+        public static readonly Minal EMPTY = new Minal("ε");
+
         public string Name
         {
             get;
