@@ -31,9 +31,9 @@ namespace Xtaieer.Grammar
             productions.Add(minal);
         }
 
-        public IEnumerator<Minal[]> ProductionIterator()
+        public IEnumerable<Minal[]> ProductionIterator()
         {
-            return productions.GetEnumerator();
+            return productions;
         }
     }
 }

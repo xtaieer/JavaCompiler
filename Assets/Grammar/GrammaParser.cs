@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using Xtaieer.Lex;
 
 namespace Xtaieer.Grammar
@@ -20,6 +21,7 @@ namespace Xtaieer.Grammar
             MINAL,
             SINGLE_CHAR_MINAL
         }
+
         private class Token
         {
             public static readonly Token EMPTY = new Token("", TokenType.EMPTY);
@@ -94,18 +96,61 @@ namespace Xtaieer.Grammar
             terminals.Add(terminal, new Terminal(terminal));
         }
 
-
-
-        private void RightT()
+        public void AddProduction(string production)
         {
-            Right();
+            lex.SetInput(new StringReader(production));
+            current = lex.NextToken();
+            Nonterminal nonterminal = Nonterminal();
+            Match(TokenType.SYMBOL);
+            List<Minal[]> productions = RightT(null);
+            foreach(Minal[] pro in productions)
+            {
+                nonterminal.AddProduction(pro);
+            }
+        }
+
+        public Nonterminal[] GetResult()
+        {
+            List<Nonterminal> result = new List<Nonterminal>(nonterminals.Count);
+            foreach(Nonterminal nonterminal in nonterminals.Values)
+            {
+                result.Add(nonterminal);
+            }
+            return result.ToArray();
+        }
+
+        private List<Minal[]> RightT(List<Minal[]> productions)
+        {
+            List<Minal[]> result = productions;
+            if(result == null)
+            {
+                result = new List<Minal[]>();
+            }
+            LinkedList<Minal> minalLinkedList = new LinkedList<Minal>();
+            minalLinkedList = Right(minalLinkedList);
+            Minal[] minals = new Minal[minalLinkedList.Count];
+            LinkedListNode<Minal> head = minalLinkedList.First;
+            int index = 0;
+            while(head != null)
+            {
+                minals[index] = head.Value;
+                index++;
+                head = head.Next;
+            }
+            result.Add(minals);
+            if (current != null && current.Type == TokenType.SYMBOL && current.Name == ";")
+            {
+                Match(TokenType.SYMBOL);
+                return RightT(result);
+            }
+            return result;
         }
 
         private LinkedList<Minal> Right(LinkedList<Minal> left)
         {
             Minal minal = Minal();
-            left.AddBefore(left.First, minal);
-            if(current.Type == TokenType.MINAL || current.Type == TokenType.SINGLE_CHAR_MINAL)
+            left.AddFirst(minal);
+            if(current != null && (current.Type == TokenType.MINAL || current.Type == TokenType.SINGLE_CHAR_MINAL))
             {
                 return Right(left);
             }
@@ -114,41 +159,58 @@ namespace Xtaieer.Grammar
 
         private Minal Minal()
         {
-            Token token = current;
-            Match(TokenType.MINAL);
-            if (terminals.ContainsKey(token.Name))
+            if (terminals.ContainsKey(current.Name) || current.Type == TokenType.SINGLE_CHAR_MINAL)
             {
-                Minal minal = terminals[token.Name];
-                return minal;
+                return Terminal();
             }
             else
             {
-                if(nonterminals.ContainsKey(token.Name))
-                {
-                    return nonterminals[token.Name];
-                }
-                else
-                {
-                    Nonterminal nonterminal = new Nonterminal(token.Name);
-                    nonterminals.Add(token.Name, nonterminal);
-                    return nonterminal;
-                }
+                return Nonterminal();
             }
         }
 
-        private void Terminal()
+        private Terminal Terminal()
         {
-
+            Token token = current;
+            if (current.Type == TokenType.SINGLE_CHAR_MINAL)
+            {
+                Match(TokenType.SINGLE_CHAR_MINAL);
+                if (!terminals.ContainsKey(token.Name))
+                {
+                    Terminal minal = new Terminal(token.Name);
+                    terminals.Add(token.Name, minal);
+                }
+            }
+            else
+            {
+                Match(TokenType.MINAL);
+            }
+            return terminals[token.Name];
         }
 
-        private void Nonterminal()
+        private Nonterminal Nonterminal()
         {
-
+            Token token = current;
+            Match(TokenType.MINAL);
+            if (nonterminals.ContainsKey(token.Name))
+            {
+                return nonterminals[token.Name];
+            }
+            else
+            {
+                Nonterminal nonterminal = new Nonterminal(token.Name);
+                nonterminals.Add(token.Name, nonterminal);
+                return nonterminal;
+            }
         }
 
         private void Match(TokenType type)
         {
             current = lex.NextToken();
+            while (current != null && current.Type == TokenType.EMPTY)
+            {
+                current = lex.NextToken();
+            }
         }
     }
 }
